@@ -9,7 +9,7 @@
           path: '/items/fiches',
           project: 'cultures-hackers',
           map: {
-            fields: 'id,titre,latitude,longitude,personnes_ou_organisations,annee,mois,jour,lieu',
+            fields: 'id,titre,latitude,longitude,personnes_ou_organisations,annee,mois,jour,lieu,tags,resume,owner.first_name,owner.last_name,pdf.data,photo.data',
             sort: 'id',
             limit: '-1',
             status: 'published'

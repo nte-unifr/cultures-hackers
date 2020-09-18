@@ -86,23 +86,30 @@ export default {
       this.cluster = L.markerClusterGroup();
     },
     createMarker: function(lat, lng, content) {
-      let lMarker = L.marker([lat, lng]);
+      lat = isNaN(Number(lat)) ? 0 : Number(lat)
+      lng = isNaN(Number(lng)) ? 0 : Number(lng)
+      let lMarker = L.marker([Number(lat), Number(lng)]);
       let popup = L.popup().setContent(content);
-      lMarker.bindPopup(popup);
+      lMarker.bindPopup(popup, {
+        maxWidth: 650
+      })
       let m = {
         id: 1,
         lMarker: lMarker
       };
       this.markers.push(m);
     },
-    buildTooltip: function(id, title, po, year, month, day, location) {
-      let str =
-        '<div class="title is-4" style="margin-bottom:0.8rem">' +
-        title +
-        "</div>"
-      str += '<table class="table" style="font-size:18px">'
+    buildTooltip: function(id, title, po, year, month, day, location, tags, resume, owner, pdf, photo) {
+      let str = ''
+      str += '<div class="media">'
+      if (photo != undefined && photo.data.thumbnails[2].url != null && photo.data.thumbnails[2].url != "") {
+        str += '<div class="media-left"><figure class="image is-96x96"><img src="' + photo.data.thumbnails[2].url + '"></figure></div>'
+      }
+      str += '<div class="media-content"><p class="title is-4">' + title + '</p><p class="subtitle is-6"><span class="tag is-dark">' + feather.icons.hash.toSvg({ 'width': 15 }) + id + '</span></p></div>'
+      str += '</div>'
+      str += '<table class="table" style="font-size:18px; margin-top:1rem">'
       if (po != null && po != "") {
-        str += '<tr><td>' + feather.icons.users.toSvg() + '</td><td>' + po + "</td></tr>"
+        str += '<tr><td>' + feather.icons.users.toSvg() + '</td><td>' + po + '</td></tr>'
       }
       if (year != null && year != "" || month != null && month != "" || day != null && day != "") {
         str += '<tr><td>' + feather.icons.clock.toSvg() + '</td><td>'
@@ -114,9 +121,28 @@ export default {
         str += '</td></tr>'
       }
       if (location != null && location != "") {
-        str += '<tr><td>' + feather.icons['map-pin'].toSvg() + '</td><td>' + location + "</td></tr>"
+        str += '<tr><td>' + feather.icons['map-pin'].toSvg() + '</td><td>' + location + '</td></tr>'
       }
-      str += '<tr><td>' + feather.icons.hash.toSvg() + '</td><td>' + id + '</td></tr>'
+      if (tags != null && tags.length > 0) {
+        str += '<tr><td>' + feather.icons.tag.toSvg() + '</td><td>'
+        for (const tag of tags) {
+          if (tags.length -1 !== tags.indexOf(tag)) {
+            str += tag + ', '
+          } else {
+            str += tag
+          }
+        }
+        str += '</td></tr>'
+      }
+      if (resume != null && resume != "" && resume != " ") {
+        str += '<tr><td>' + feather.icons['align-justify'].toSvg() + '</td><td>' + resume + '</td></tr>'
+      }
+      if (pdf != undefined && pdf.data.full_url != null && pdf.data.full_url != "") {
+        str += '<tr><td>' + feather.icons['file'].toSvg() + '</td><td><a href="' + pdf.data.full_url + '">PDF</a></td></tr>'
+      }
+      if (owner.first_name != null && owner.first_name != "" && owner.last_name != null && owner.last_name != "") {
+        str += '<tr><td>' + feather.icons['edit-3'].toSvg() + '</td><td>' + owner.first_name + ' ' + owner.last_name + '</td></tr>'
+      }
       str += "</table>"
 
       return str;
@@ -162,7 +188,7 @@ export default {
         this.createMarker(
           item.latitude,
           item.longitude,
-          this.buildTooltip(item.id, item.titre, item.personnes_ou_organisations, item.annee, item.mois, item.jour, item.lieu)
+          this.buildTooltip(item.id, item.titre, item.personnes_ou_organisations, item.annee, item.mois, item.jour, item.lieu, item.tags, item.resume, item.owner, item.pdf, item.photo)
         );
       }
     }
