@@ -1,6 +1,6 @@
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/ludus/'
+    ? '/cultures-hackers/'
     : '/',
   devServer: {
     disableHostCheck: true
